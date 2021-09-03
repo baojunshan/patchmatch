@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 
 class PatchMatch:
@@ -74,7 +75,7 @@ class PatchMatch:
                 f[curr_h, curr_w] = f[curr_h, min(curr_w + 1, x_w - 1)]
         d[curr_h, curr_w] = self.calc_dist(x_c=curr_p, y_c=f[curr_h, curr_w], x=x, y=y)
 
-    def random_search(self, curr_p, x, y, f):
+    def random_search(self, curr_p, x, y, f, d):
         curr_h, curr_w = curr_p
         y_h, y_w, _ = y.shape
         p = self.patch_size // 2
@@ -88,41 +89,46 @@ class PatchMatch:
         y_curr_w = f[curr_h, curr_w][1]
 
         while search_h > 1 and search_w > 1:
-            search_min_r = max(y_curr_h - search_h, p)
-            search_max_r = min(y_curr_w + search_h, y_w - p)
-            random_b_x = np.random.randint(search_min_r, search_max_r)
-            search_min_c = max(b_y - search_w, p)
-            search_max_c = min(b_y + search_w, B_w - p)
-            random_b_y = np.random.randint(search_min_c, search_max_c)
-            search_h = B_h * alpha ** i
-            search_w = B_w * alpha ** i
-            b = np.array([random_b_x, random_b_y])
-            d = cal_distance(a, b, A_padding, B, p_size)
-            if d < dist[x, y]:
-                dist[x, y] = d
-                f[x, y] = b
+            random_h = np.random.randint(
+                max(y_curr_h - search_h, p),
+                min(y_curr_h + search_h, y_h - p)
+            )
+            random_w = np.random.randint(
+                max(y_curr_w - search_w, p),
+                min(y_curr_w + search_w, y_w - p)
+            )
+            random_p = np.array([random_h, random_w])
+            random_d = self.calc_dist(x_c=curr_p, y_c=random_p, x=x, y=y)
+            if random_d < d[curr_h, curr_w]:
+                d[curr_h, curr_w] = random_d
+                f[curr_h, curr_w] = random_p
+
             i += 1
+            search_h = y_h * self.alpha ** i
+            search_w = y_w * self.alpha ** i
 
     def train(self, x, y, n_iter=10):
+        start_time = time.time()
         f, d, x_padding = self.init(x, y)
         x_h, x_w, _ = x.shape
+        print(f"| Init cost {time.time() - start_time:.3f} seconds.")
 
         for itr in range(1, n_iter + 1):
+            curr_time = time.time()
             if itr % 2 != 0:
                 for i in range(x_h):
                     for j in range(x_w):
                         curr_p = np.array([i, j])
                         self.propagation(x=x_padding, y=y, curr_p=curr_p, f=f, d=d, odd=False)
-                        # random_search(f, a, dist, img_padding, ref, p_size)
+                        self.random_search(curr_p=curr_p, x=x_padding, y=y, f=f, d=d)
             else:
                 for i in range(x_h - 1, -1, -1):
                     for j in range(x_w - 1, -1, -1):
                         curr_p = np.array([i, j])
                         self.propagation(x=x_padding, y=y, curr_p=curr_p, f=f, d=d, odd=True)
-                        # random_search(f, a, dist, img_padding, ref, p_size)
-            print("iteration: %d" % (itr))
-        return f
-
+                        self.random_search(curr_p=curr_p, x=x_padding, y=y, f=f, d=d)
+            print(f"| Finish {itr}/{n_iter} iteration, cost {time.time() - curr_time:.3} seconds.")
+        return self.reconstruction(x=x, y=y, f=f)
 
 
 if __name__ == "__main__":
@@ -133,9 +139,10 @@ if __name__ == "__main__":
 
     a = cv2.imread("images/x_0.jpg")
     b = cv2.imread("images/y_0.jpg")
-    print(a.shape)
 
     patchmatch = PatchMatch(patch_size=p_size)
-    patchmatch.train(a, b)
+    c = patchmatch.train(x=a, y=b, n_iter=10)
+    cv2.imwrite("images/x_y_0.jpg", c)
+
 
 
