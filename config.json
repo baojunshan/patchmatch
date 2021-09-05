@@ -1,0 +1,15 @@
+{
+  "patch_size": 35,
+  "min_disparity": 0,
+  "max_disparity": 64,
+  "gamma": 10,
+  "alpha": 0.9,
+  "tau_col": 10,
+  "tau_grad": 2,
+  "n_iter": 3,
+  "is_check_lr": false,
+  "lr_check_threshold": 0,
+  "is_fill_holes": false,
+  "is_force_fpw": false,
+  "is_integer_disparity": false
+}

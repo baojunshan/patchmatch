@@ -1,5 +1,6 @@
 from functools import wraps
 import time
+import json
 
 
 def timer(func):
@@ -11,6 +12,20 @@ def timer(func):
         return res
 
     return wrapped
+
+
+class PMSConfig:
+    def __init__(self, path):
+        with open(path, "r") as f:
+            self.config = json.load(f)
+        for k, v in self.config.items():
+            setattr(self, k, v)
+
+
+class PGraient:
+    def __init__(self, x=0, y=0):
+        self.x = x
+        self.y = y
 
 
 class PVector3f:
@@ -76,17 +91,57 @@ class DisparityPlane:
 
 class PatchMatchStereo:
     def __init__(self):
-        pass
+        self.width = 0
+        self.height = 0
+        self.config = config
+
+    def init(self, h, w, config):
+        # ··· 赋值
+        # 影像尺寸
+        self.width = w;
+        self.height = h;
+        # PMS参数
+        self.config = config;
+
+        if (width <= 0 || height <= 0) {
+        return false;
+        }
+
+        //··· 开辟内存空间
+        const sint32 img_size = width * height;
+        const sint32 disp_range = option.max_disparity - option.min_disparity;
+        // 灰度数据
+        gray_left_ = new uint8[img_size];
+        gray_right_ = new uint8[img_size];
+        // 梯度数据
+        grad_left_ = new PGradient[img_size]();
+        grad_right_ = new PGradient[img_size]();
+        // 代价数据
+        cost_left_ = new float32[img_size];
+        cost_right_ = new float32[img_size];
+        // 视差图
+        disp_left_ = new float32[img_size];
+        disp_right_ = new float32[img_size];
+        // 平面集
+        plane_left_ = new DisparityPlane[img_size];
+        plane_right_ = new DisparityPlane[img_size];
+
+        is_initialized_ = grad_left_ && grad_right_ && disp_left_ && disp_right_  && plane_left_ && plane_right_;
+
+        return is_initialized_;
 
     @timer
-    def init(self):
-        time.sleep(2)
+    def random_init(self, w, h):
+        pass
 
     def train(self, x, y):
-        self.init()
+        self.random_init(x, y)
 
 
 if __name__ == "__main__":
     p = PatchMatchStereo()
 
     p.train(x=1, y=2)
+
+    config = PMSConfig("config.json")
+    print(config.n_iter)
