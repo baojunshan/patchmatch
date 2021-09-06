@@ -137,12 +137,13 @@ if __name__ == "__main__":
     p_size = 3
     n_iter = 10
 
-    a = cv2.imread("images/x_0.jpg")
-    b = cv2.imread("images/y_0.jpg")
+    a = cv2.imread("images/pm_0_left.jpg")
+    b = cv2.imread("images/pm_0_right.jpg")
+    print(a.shape)
 
     patchmatch = PatchMatch(patch_size=p_size)
     c = patchmatch.train(x=a, y=b, n_iter=10)
-    cv2.imwrite("images/x_y_0.jpg", c)
+    cv2.imwrite("images/pm_0_res.jpg", c)
 
 
 
