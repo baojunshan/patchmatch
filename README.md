@@ -38,5 +38,5 @@ patch_size=5, n_iter=3 结果
 ```
 
 <p float="left">
-    <img src="./images/pms_0_left.png" width="300" height="200"/><img src="./images/pms_0_right.png" width="300" height="300"/><img src="./images/pms_0_disparity.png" width="200" height="200"/>
+    <img src="./images/pms_0_left.png" width="200" height="200"/><img src="./images/pms_0_right.png" width="200" height="200"/><img src="./images/pms_0_disparity.png" width="200" height="200"/>
 </p>
