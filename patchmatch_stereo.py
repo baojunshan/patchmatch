@@ -575,6 +575,9 @@ class PatchMatchStereo:
 
     @timer("Get disparity map")
     def get_disparity_map(self, view=0, norm=False):
+        return self._get_disparity_map(view=view, norm=norm)
+
+    def _get_disparity_map(self, view=0, norm=False):
         if view == 0:
             disparity = self.disparity_left.copy()
         else:
@@ -593,7 +596,7 @@ class PatchMatchStereo:
         cloud = list()
         for y in range(self.height):
             for x in range(self.width):
-                disp = np.abs(self.get_disparity_map(0)[y, x])
+                disp = np.abs(self._get_disparity_map(view=0)[y, x])
                 z_ = b * f / (disp + (r_x - l_x))
                 x_ = z_ * (x - l_x) / f
                 y_ = z_ * (y - l_y) / f
@@ -612,7 +615,7 @@ if __name__ == "__main__":
     p = PatchMatchStereo(height=height_, width=width_, config=config_)
     p.match(image_left=left, image_right=right)
     disparity_ = p.get_disparity_map(view=0, norm=True)
-    cv2.imwrite("disparity.png", disparity_)
+    cv2.imwrite("./images/pms_0_disparity.png", disparity_)
 
     cloud = p.get_disparity_cloud(
         baseline=193.001,
@@ -620,6 +623,6 @@ if __name__ == "__main__":
         principal_point_left=(294.182, 252.932),
         principal_point_right=(326.95975, 252.932)
     )
-    with open("cloud.txt", "w") as f:
+    with open("./images/pms_0_clouds.txt", "w") as f:
         for c in cloud:
             f.write(" ".join([str(i) for i in c]) + "\n")
