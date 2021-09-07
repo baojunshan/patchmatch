@@ -346,7 +346,7 @@ class PropagationPMS:
 
 class PatchMatchStereo:
     def __init__(self, width, height, config, random_seed=2021):
-        self.random_seed = 2021
+        self.random_seed = random_seed
         random.seed(random_seed)
         np.random.seed(random_seed)
         self.image_left = None
