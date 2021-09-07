@@ -591,8 +591,8 @@ class PatchMatchStereo:
     def get_disparity_cloud(self, baseline, focal_length, principal_point_left, principal_point_right):
         b = baseline
         f = focal_length
-        l_y, l_x = principal_point_left
-        r_y, r_x = principal_point_right
+        l_x, l_y = principal_point_left
+        r_x, r_y = principal_point_right
         cloud = list()
         for y in range(self.height):
             for x in range(self.width):
